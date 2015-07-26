@@ -1,0 +1,10 @@
+#tweets {
+  height: 72px;
+  overflow: scroll;
+}
+
+.tweet {
+  line-height: 18px;
+  text-align: center;
+}
+

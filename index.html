@@ -6,20 +6,54 @@
     <link rel="stylesheet" type="text/css" href="css/main.css">
   </head>
   <body>
+    
     <script>
 
       $(document).ready(function(){
         var $body = $('body');
-        $body.html('');
+        $body.html(''); 
+        var $button = $('<button id="refresh">Get New Tweets</button>');
+        $button.appendTo($body);
+        var $tweets = $('<div id="tweets"></div>');
+        $tweets.appendTo($body);
 
-        var index = streams.home.length - 1;
-        while(index >= 0){
+
+        var buildTweet = function(index) {
           var tweet = streams.home[index];
           var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
+          $tweet.addClass('tweet');
+          var $username = $('<a class="username">' + "@" + tweet.user + '</a>');
+          $tweet.text(' ' + tweet.message + tweet.created_at);
+          $username.prependTo($tweet);
+          return $tweet;
+        };  
+        
+        var index = streams.home.length - 1;
+        var lastNewest = index;
+        while(index >= 0) {  
+          buildTweet(index).appendTo($tweets);
           index -= 1;
         }
+        
+        var showTimeline = function() {
+
+        }
+
+        var addNewTweets = function(newest, oldest) {
+
+          lastNewest = newest;
+          while (oldest <= newest) {
+            buildTweet(oldest).prependTo($tweets);
+            oldest++;
+
+          }
+        };
+
+        $($button).on('click', function() {
+          addNewTweets(streams.home.length - 1, lastNewest + 1);
+        });
+
+        
 
       });
 
