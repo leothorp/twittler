@@ -3,6 +3,8 @@
   <head>
     <script src="js/jquery.js"></script>
     <script src="js/data_generator.js"></script>
+    <script src="js/moment.js"></script>
+    <script src="js/livestamp.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/main.css">
   </head>
   <body>
@@ -12,49 +14,63 @@
       $(document).ready(function(){
         var $body = $('body');
         $body.html(''); 
+        //create refresh button and tweet display area
         var $button = $('<button id="refresh">Get New Tweets</button>');
         $button.appendTo($body);
         var $tweets = $('<div id="tweets"></div>');
         $tweets.appendTo($body);
 
-
-        var buildTweet = function(index) {
-          var tweet = streams.home[index];
+        //function to construct a new jquery tweet object
+        var buildTweet = function(tweet) {        
           var $tweet = $('<div></div>');
           $tweet.addClass('tweet');
-          var $username = $('<a class="username">' + "@" + tweet.user + '</a>');
-          $tweet.text(' ' + tweet.message + tweet.created_at);
+
+          //create clickable username to display timeline
+          var $username = $('<a class="username" data-user="' + tweet.user + '"></a>');
+          $username.text('@' + tweet.user);
+
+          //create human friendly timestamp
+          var $creationTime = $('<span style="color:blue"></span>');        
+          $tweet.text(' ' + tweet.message + ' ');
           $username.prependTo($tweet);
+          $creationTime.appendTo($tweet);
+          $creationTime.livestamp(tweet.created_at);
           return $tweet;
-        };  
+        }; 
+
         
-        var index = streams.home.length - 1;
-        var lastNewest = index;
-        while(index >= 0) {  
-          buildTweet(index).appendTo($tweets);
-          index -= 1;
-        }
+
+       
+        var lastNewest = streams.home.length - 1;
         
-        var showTimeline = function() {
-
-        }
-
-        var addNewTweets = function(newest, oldest) {
-
-          lastNewest = newest;
-          while (oldest <= newest) {
-            buildTweet(oldest).prependTo($tweets);
-            oldest++;
-
+        //add latest tweets
+        var addNewTweets = function(newest, oldest, collection) {
+          if (collection === undefined) {
+            collection = streams.home;
           }
+          while (oldest <= newest) {
+            buildTweet(collection[oldest]).prependTo($tweets);
+            oldest++;
+          }
+          //remember where we left off so none are re-added
+          lastNewest = newest;
         };
 
+        //initial population of the tweet display
+        addNewTweets(streams.home.length - 1, 0);
+
+        //when button is clicked, update with newest tweets 
         $($button).on('click', function() {
           addNewTweets(streams.home.length - 1, lastNewest + 1);
         });
 
-        
-
+        //clear tweets, find clicked users tweets, and populate the screen with those tweets   
+        $('div').on('click', 'a.username', function() {
+          var username = $(this).data('user');
+          $tweets.empty();
+          var userTweets = streams.users[username];
+          addNewTweets(userTweets.length - 1, 0, userTweets);
+        });
       });
 
     </script>
