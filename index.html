@@ -8,18 +8,24 @@
     <link rel="stylesheet" type="text/css" href="css/main.css">
   </head>
   <body>
-    
+    <h1 id="title">Leo Thorp's Twittler</h1>
+    <button id="refresh">Get New Tweets</button>
+    <div id="tweets"></div>
+    <form id="tweet-entry">
+      <input type="text" id="visitor-name" placeholder="Enter your name."> <br>
+      <input type="text" id="visitor-tweet" placeholder="Enter your tweet."> <br>
+    </form>  
+    <button id="send-tweet">Submit</button>
+
+
     <script>
 
       $(document).ready(function(){
         var $body = $('body');
-        $body.html(''); 
-        //create refresh button and tweet display area
-        var $button = $('<button id="refresh">Get New Tweets</button>');
-        $button.appendTo($body);
-        var $tweets = $('<div id="tweets"></div>');
-        $tweets.appendTo($body);
-
+        var $button = $('#refresh');
+        var $tweets = $('#tweets');
+        var $submit = $('#send-tweet');
+        
         //function to construct a new jquery tweet object
         var buildTweet = function(tweet) {        
           var $tweet = $('<div></div>');
@@ -30,7 +36,7 @@
           $username.text('@' + tweet.user);
 
           //create human friendly timestamp
-          var $creationTime = $('<span style="color:blue"></span>');        
+          var $creationTime = $('<span class="creation-time"></span>');        
           $tweet.text(' ' + tweet.message + ' ');
           $username.prependTo($tweet);
           $creationTime.appendTo($tweet);
@@ -70,6 +76,18 @@
           $tweets.empty();
           var userTweets = streams.users[username];
           addNewTweets(userTweets.length - 1, 0, userTweets);
+        });
+
+        //post the user's tweet
+        $submit.on('click', function() {
+          console.log($('#visitor-name').val());
+          window.visitor = $('#visitor-name').val();
+          if  (!(visitor in streams.users)) {
+            streams.users[visitor] = [];
+          }        
+          writeTweet($('#visitor-tweet').val());
+          addNewTweets(streams.home.length - 1, lastNewest + 1);
+          $('#visitor-tweet').val('');
         });
       });
 
