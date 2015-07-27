@@ -16,10 +16,8 @@
       <input type="text" id="visitor-tweet" placeholder="Enter your tweet."> <br>
     </form>  
     <button id="send-tweet">Submit</button>
-
-
+    
     <script>
-
       $(document).ready(function(){
         var $body = $('body');
         var $button = $('#refresh');
@@ -44,9 +42,6 @@
           return $tweet;
         }; 
 
-        
-
-       
         var lastNewest = streams.home.length - 1;
         
         //add latest tweets
